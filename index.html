@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CNS Paper 1 – Full Quiz</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <div class="quiz-container" id="app">
+
+        <!-- header -->
+<div class="quiz-header">
+    <div class="quiz-title">🧠 CNS <span>Paper 1</span></div>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌓</button>
+        <div class="progress-badge">
+            <strong id="qCounter">0</strong> / <span id="totalQ">0</span>
+        </div>
+    </div>
+    <!-- ─── COUNTER DISPLAY ─── -->
+    <div style="font-size:14px; color:var(--text-light); display:flex; gap:20px; margin-top:4px; width:100%; flex-wrap:wrap;">
+        <span>🌐 Total visits: <strong id="totalVisitors">0</strong></span>
+        <span>👤 Unique visitors: <strong id="uniqueVisitors">0</strong></span>
+    </div>
+</div>
+        <!-- subject tabs -->
+        <div class="subject-tabs" id="subjectTabs">
+            <button class="subject-btn active" data-subject="all">All <span class="subject-count" id="countAll">0</span></button>
+            <button class="subject-btn" data-subject="Anatomy">Anatomy <span class="subject-count" id="countAnatomy">0</span></button>
+            <button class="subject-btn" data-subject="Physiology">Physiology <span class="subject-count" id="countPhysiology">0</span></button>
+            <button class="subject-btn" data-subject="Biochemistry">Biochemistry <span class="subject-count" id="countBiochemistry">0</span></button>
+            <button class="subject-btn" data-subject="Histology">Histology <span class="subject-count" id="countHistology">0</span></button>
+            <button class="subject-btn" data-subject="Pharmacology">Pharmacology <span class="subject-count" id="countPharmacology">0</span></button>
+        </div>
+
+        <!-- progress -->
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- question navigator -->
+        <div class="question-nav" id="questionNav"></div>
+
+        <!-- main quiz area -->
+        <div id="quizArea">
+
+            <div class="question-scroll">
+
+                <div class="question-number" id="qNumLabel">Question 1</div>
+                <div class="question-text" id="qText">Loading questions…</div>
+
+                <div class="options-list" id="optionsContainer"></div>
+
+                <div class="feedback-box" id="feedbackBox">
+                    <span class="fb-label" id="fbLabel"></span>
+                    <span id="fbText"></span>
+                    <div class="explanation" id="explanationText"></div>
+                </div>
+
+                <div class="question-meta" id="qMeta"></div>
+
+            </div>
+
+            <!-- controls -->
+            <div class="controls">
+                <div class="btn-group">
+                    <button class="btn btn-outline btn-sm" id="resetBtn">⟲ Reset</button>
+                    <button class="btn btn-outline btn-sm" id="shuffleBtn">🔀 Shuffle</button>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-outline btn-sm" id="prevBtn">← Back</button>
+                    <button class="btn btn-outline btn-sm" id="nextBtn">Next →</button>
+                </div>
+            </div>
+
+            <!-- stats -->
+            <div class="stats">
+                <span>✅ Correct: <span class="num" id="correctCount">0</span></span>
+                <span>❌ Wrong: <span class="num" id="wrongCount">0</span></span>
+                <span style="margin-left:auto; opacity:0.6;">⏱️ <span id="answeredCount">0</span> answered</span>
+            </div>
+
+        </div>
+
+        <!-- end screen -->
+        <div class="end-screen" id="endScreen">
+            <div class="big-icon">🏁</div>
+            <h2>You finished!</h2>
+            <div class="score-display" id="finalScore">0%</div>
+            <div class="sub-text" id="finalSub">Great effort — keep learning!</div>
+            <div>
+                <button class="btn btn-primary" id="restartBtn">⟲ Restart Quiz</button>
+                <button class="btn btn-outline" id="reviewBtn">📋 Review wrong answers</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ─── External Scripts ──────────────────────────────────────────── -->
+    <script src="questions.js?v=3"></script>
+    <script src="theme.js"></script>
+
+    <!-- ─── Main Quiz Engine ──────────────────────────────────────────── -->
+    <script>
+        // ─── Check if QUESTION_BANK loaded ──────────────────────────────
+        if (typeof QUESTION_BANK === 'undefined') {
+            alert('❌ Error: questions.js failed to load.');
+            console.error('QUESTION_BANK is not defined.');
+        } else {
+            console.log('✅ questions.js loaded successfully. Total questions:', QUESTION_BANK.length);
+        }
+
+        // ─── QUIZ ENGINE ──────────────────────────────────────────────────────
+
+        const state = {
+            allQuestions: typeof QUESTION_BANK !== 'undefined' ? QUESTION_BANK : [],
+            filteredQuestions: [],
+            currentIndex: 0,
+            selected: null,
+            answered: false,
+            correctCount: 0,
+            wrongCount: 0,
+            userAnswers: {},
+            results: {},
+            currentSubject: 'all'
+        };
+
+        const $ = id => document.getElementById(id);
+        const qText = $('qText');
+        const qNumLabel = $('qNumLabel');
+        const qMeta = $('qMeta');
+        const optionsContainer = $('optionsContainer');
+        const feedbackBox = $('feedbackBox');
+        const fbLabel = $('fbLabel');
+        const fbText = $('fbText');
+        const explanationText = $('explanationText');
+        const progressFill = $('progressFill');
+        const qCounter = $('qCounter');
+        const totalQ = $('totalQ');
+        const correctCount = $('correctCount');
+        const wrongCount = $('wrongCount');
+        const answeredCount = $('answeredCount');
+        const prevBtn = $('prevBtn');
+        const nextBtn = $('nextBtn');
+        const resetBtn = $('resetBtn');
+        const shuffleBtn = $('shuffleBtn');
+        const restartBtn = $('restartBtn');
+        const reviewBtn = $('reviewBtn');
+        const quizArea = $('quizArea');
+        const endScreen = $('endScreen');
+        const finalScore = $('finalScore');
+        const finalSub = $('finalSub');
+        const subjectTabs = document.querySelectorAll('.subject-btn');
+        const questionNav = $('questionNav');
+
+        const LABELS = ['A', 'B', 'C', 'D', 'E'];
+
+        // ─── Explanation Engine ──────────────────────────────────────────────
+        function getDetailedExplanation(q) {
+            // If the question has a built-in explanation, use it
+            if (q.explanation) return q.explanation;
+            // Otherwise generate a fallback
+            const correctText = q.options[q.answer] || 'Unknown';
+            return `The correct answer is ${LABELS[q.answer]}: "${correctText}". This is the best choice because it accurately reflects the established principle. The other options are either incorrect or describe different structures/functions.`;
+        }
+
+        // ─── Shuffle ──────────────────────────────────────────────────────────
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // ─── Subject counts ──────────────────────────────────────────────────
+        function getSubjectCount(subject) {
+            if (subject === 'all') return state.allQuestions.length;
+            return state.allQuestions.filter(q => q.subject === subject).length;
+        }
+
+        function updateSubjectCounts() {
+            document.getElementById('countAll').textContent = state.allQuestions.length;
+            document.getElementById('countAnatomy').textContent = getSubjectCount('Anatomy');
+            document.getElementById('countPhysiology').textContent = getSubjectCount('Physiology');
+            document.getElementById('countBiochemistry').textContent = getSubjectCount('Biochemistry');
+            document.getElementById('countHistology').textContent = getSubjectCount('Histology');
+            document.getElementById('countPharmacology').textContent = getSubjectCount('Pharmacology');
+        }
+
+        // ─── Set subject ──────────────────────────────────────────────────────
+        function setSubject(subject) {
+            state.currentSubject = subject;
+            subjectTabs.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.subject === subject);
+            });
+            if (subject === 'all') {
+                state.filteredQuestions = [...state.allQuestions];
+            } else {
+                state.filteredQuestions = state.allQuestions.filter(q => q.subject === subject);
+            }
+            state.currentIndex = 0;
+            state.selected = null;
+            state.answered = false;
+            state.correctCount = 0;
+            state.wrongCount = 0;
+            state.userAnswers = {};
+            state.results = {};
+            totalQ.textContent = state.filteredQuestions.length;
+            endScreen.classList.remove('show');
+            quizArea.style.display = 'block';
+            renderQuestion();
+            updateStats();
+            buildNavigator();
+        }
+
+        // ─── Build Navigator ──────────────────────────────────────────────────
+        function buildNavigator() {
+            questionNav.innerHTML = '';
+            const total = state.filteredQuestions.length;
+            for (let i = 0; i < total; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'qnav-btn';
+                btn.textContent = i + 1;
+                btn.dataset.index = i;
+                const result = state.results[i];
+                if (result === 'correct') btn.classList.add('answered-correct');
+                else if (result === 'wrong') btn.classList.add('answered-wrong');
+                if (i === state.currentIndex) btn.classList.add('active');
+                btn.addEventListener('click', () => {
+                    goToQuestion(i);
+                });
+                questionNav.appendChild(btn);
+            }
+        }
+
+        // ─── Go to question ──────────────────────────────────────────────────
+        function goToQuestion(index) {
+            if (index < 0 || index >= state.filteredQuestions.length) return;
+            state.currentIndex = index;
+            if (!state.results[index]) {
+                state.selected = state.userAnswers[index] !== undefined ? state.userAnswers[index] : null;
+                state.answered = false;
+            } else {
+                state.selected = state.userAnswers[index] !== undefined ? state.userAnswers[index] : null;
+                state.answered = true;
+            }
+            renderQuestion();
+            buildNavigator();
+        }
+
+        // ─── Render question ──────────────────────────────────────────────────
+        function renderQuestion() {
+            const q = state.filteredQuestions[state.currentIndex];
+            if (!q) {
+                qText.textContent = 'No questions available.';
+                optionsContainer.innerHTML = '';
+                feedbackBox.classList.remove('show');
+                return;
+            }
+
+            qNumLabel.textContent = `Question ${state.currentIndex + 1} of ${state.filteredQuestions.length}`;
+            qText.textContent = q.text;
+            qMeta.textContent = q.meta || '';
+
+            optionsContainer.innerHTML = '';
+            q.options.forEach((optText, idx) => {
+                const div = document.createElement('div');
+                div.className = 'option-item';
+                div.dataset.index = idx;
+                div.innerHTML = `
+                    <span class="option-letter">${LABELS[idx]}</span>
+                    <span class="option-text">${optText}</span>
+                `;
+                div.addEventListener('click', () => handleOptionClick(idx));
+                optionsContainer.appendChild(div);
+            });
+
+            const prevAns = state.userAnswers[state.currentIndex];
+            if (prevAns !== undefined) {
+                const items = optionsContainer.querySelectorAll('.option-item');
+                items.forEach(el => {
+                    const idx = parseInt(el.dataset.index);
+                    if (idx === prevAns) {
+                        el.classList.add('selected');
+                        state.selected = prevAns;
+                    }
+                });
+                if (state.results[state.currentIndex]) {
+                    const isCorrect = state.results[state.currentIndex] === 'correct';
+                    showFeedback(isCorrect, q.answer);
+                    state.answered = true;
+                    optionsContainer.querySelectorAll('.option-item').forEach(el => {
+                        const idx = parseInt(el.dataset.index);
+                        el.classList.add('disabled');
+                        if (idx === q.answer) el.classList.add('correct-reveal');
+                        if (idx === prevAns && prevAns !== q.answer) el.classList.add('wrong-reveal');
+                    });
+                } else {
+                    state.answered = false;
+                    feedbackBox.classList.remove('show', 'correct', 'wrong');
+                }
+            } else {
+                state.selected = null;
+                state.answered = false;
+                feedbackBox.classList.remove('show', 'correct', 'wrong');
+            }
+
+            prevBtn.disabled = state.currentIndex === 0;
+            const isLast = state.currentIndex === state.filteredQuestions.length - 1;
+            nextBtn.textContent = isLast ? 'Finish' : 'Next →';
+
+            const pct = state.filteredQuestions.length > 0 ? ((state.currentIndex + 1) / state.filteredQuestions.length) * 100 : 0;
+            progressFill.style.width = `${Math.min(pct, 100)}%`;
+            qCounter.textContent = state.currentIndex + 1;
+
+            document.querySelector('.question-scroll').scrollTop = 0;
+            buildNavigator();
+        }
+
+        // ─── Handle option click ─────────────────────────────────────────────
+        function handleOptionClick(index) {
+            if (state.answered) return;
+            const q = state.filteredQuestions[state.currentIndex];
+            const items = optionsContainer.querySelectorAll('.option-item');
+            items.forEach(el => el.classList.remove('selected'));
+            items.forEach(el => {
+                if (parseInt(el.dataset.index) === index) el.classList.add('selected');
+            });
+            state.selected = index;
+            state.userAnswers[state.currentIndex] = index;
+            submitAnswer(index);
+        }
+
+        // ─── Submit answer ────────────────────────────────────────────────────
+        function submitAnswer(selected) {
+            const q = state.filteredQuestions[state.currentIndex];
+            const isCorrect = selected === q.answer;
+            state.answered = true;
+            state.results[state.currentIndex] = isCorrect ? 'correct' : 'wrong';
+            if (isCorrect) state.correctCount++;
+            else state.wrongCount++;
+
+            showFeedback(isCorrect, q.answer);
+            updateStats();
+            buildNavigator();
+
+            const items = optionsContainer.querySelectorAll('.option-item');
+            items.forEach(el => {
+                const idx = parseInt(el.dataset.index);
+                el.classList.add('disabled');
+                if (idx === q.answer) el.classList.add('correct-reveal');
+                if (idx === selected && selected !== q.answer) el.classList.add('wrong-reveal');
+            });
+        }
+
+        // ─── Show feedback ────────────────────────────────────────────────────
+        function showFeedback(isCorrect, answerIndex) {
+            const q = state.filteredQuestions[state.currentIndex];
+            feedbackBox.className = 'feedback-box show';
+            feedbackBox.classList.add(isCorrect ? 'correct' : 'wrong');
+            fbLabel.textContent = isCorrect ? '✅ Correct!' : '❌ Incorrect';
+            const correctText = q.options[answerIndex] || 'Unknown';
+            fbText.textContent = isCorrect ? 'Well done!' : `The correct answer was ${LABELS[answerIndex]}: "${correctText}".`;
+            explanationText.textContent = getDetailedExplanation(q);
+        }
+
+        // ─── Update stats ─────────────────────────────────────────────────────
+        function updateStats() {
+            correctCount.textContent = state.correctCount;
+            wrongCount.textContent = state.wrongCount;
+            const answered = Object.keys(state.results).length;
+            answeredCount.textContent = answered;
+        }
+
+        // ─── Navigation ──────────────────────────────────────────────────────
+        function goToPrev() {
+            if (state.currentIndex > 0) {
+                goToQuestion(state.currentIndex - 1);
+            }
+        }
+
+        function goToNext() {
+            const isLast = state.currentIndex === state.filteredQuestions.length - 1;
+            if (isLast) {
+                finishQuiz();
+                return;
+            }
+            goToQuestion(state.currentIndex + 1);
+        }
+
+        // ─── Finish ──────────────────────────────────────────────────────────
+        function finishQuiz() {
+            const total = state.filteredQuestions.length;
+            const correct = state.correctCount;
+            const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+            finalScore.textContent = `${pct}%`;
+            let msg = 'Great effort — keep learning!';
+            if (pct >= 90) msg = '🌟 Excellent! You really know your CNS!';
+            else if (pct >= 70) msg = '👍 Good job! Review the ones you missed.';
+            else if (pct >= 50) msg = '📖 Keep studying — you\'ll get there!';
+            else msg = '💪 Practice makes perfect. Try again!';
+            finalSub.textContent = msg;
+            quizArea.style.display = 'none';
+            endScreen.classList.add('show');
+        }
+
+        // ─── Reset & Shuffle ──────────────────────────────────────────────────
+        function resetQuiz() {
+            setSubject(state.currentSubject);
+        }
+
+        function shuffleQuiz() {
+            const currentQ = state.filteredQuestions[state.currentIndex];
+            state.filteredQuestions = shuffleArray([...state.filteredQuestions]);
+            const newIdx = state.filteredQuestions.findIndex(q => q.id === currentQ.id);
+            state.currentIndex = newIdx >= 0 ? newIdx : 0;
+            state.selected = null;
+            state.answered = false;
+            state.userAnswers = {};
+            state.results = {};
+            state.correctCount = 0;
+            state.wrongCount = 0;
+            renderQuestion();
+            updateStats();
+            feedbackBox.classList.remove('show', 'correct', 'wrong');
+            buildNavigator();
+        }
+
+        // ─── Event listeners ──────────────────────────────────────────────────
+
+        subjectTabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const subject = btn.dataset.subject;
+                setSubject(subject);
+            });
+        });
+
+        prevBtn.addEventListener('click', goToPrev);
+        nextBtn.addEventListener('click', goToNext);
+        resetBtn.addEventListener('click', resetQuiz);
+        shuffleBtn.addEventListener('click', shuffleQuiz);
+        restartBtn.addEventListener('click', resetQuiz);
+        reviewBtn.addEventListener('click', resetQuiz);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                goToNext();
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                goToPrev();
+            }
+            if (e.key === 'r' || e.key === 'R') resetQuiz();
+            if (!state.answered && !endScreen.classList.contains('show')) {
+                const num = parseInt(e.key);
+                if (num >= 1 && num <= 5) {
+                    handleOptionClick(num - 1);
+                }
+            }
+        });
+
+        // ─── Start ──────────────────────────────────────────────────────────────
+
+        updateSubjectCounts();
+        setSubject('all');
+    </script>
+<script src="counter.js"></script>
+</body>
+</html>
