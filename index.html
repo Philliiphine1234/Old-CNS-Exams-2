@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CNS Paper 1 – Full Quiz</title>
+    <title>CNS Paper 2 – Full Quiz</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -11,29 +11,42 @@
     <div class="quiz-container" id="app">
 
         <!-- header -->
-<div class="quiz-header">
-    <div class="quiz-title">🧠 CNS <span>Paper 1</span></div>
-    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌓</button>
-        <div class="progress-badge">
-            <strong id="qCounter">0</strong> / <span id="totalQ">0</span>
+        <div class="quiz-header">
+            <div class="quiz-title">🧠 CNS <span>Paper 2</span></div>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌓</button>
+                <div class="progress-badge">
+                    <strong id="qCounter">0</strong> / <span id="totalQ">0</span>
+                </div>
+            </div>
+            <!-- ─── TWO VISITOR COUNTERS ─── -->
+            <div style="font-size:14px; color:var(--text-light); margin-top:4px; width:100%; display:flex; align-items:center; gap:16px; flex-wrap:wrap; justify-content:center;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <span>👤 Unique:</span>
+                    <a href="https://www.hitwebcounter.com/convert-word-to-pdf" target="_blank" rel="noopener" title="Free Tool">
+                        <img src="https://www.hitwebcounter.com/counter/counter.php?page=21505993&amp;style=0010&amp;nbdigits=4&amp;type=ip" alt="Unique Visitors" decoding="async" style="border:0;max-width:100%;height:auto;vertical-align:middle;" />
+                    </a>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <span>🌐 Total:</span>
+                    <a href="https://www.hitwebcounter.com/convert-word-to-pdf" target="_blank" rel="noopener" title="Free Tool">
+                        <img src="https://www.hitwebcounter.com/counter/counter.php?page=21505994&amp;style=0010&amp;nbdigits=5&amp;type=page" alt="Total Visits" decoding="async" style="border:0;max-width:100%;height:auto;vertical-align:middle;" />
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
-    <!-- ─── COUNTER DISPLAY ─── -->
-    <div style="font-size:14px; color:var(--text-light); display:flex; gap:20px; margin-top:4px; width:100%; flex-wrap:wrap;">
-        <span>🌐 Total visits: <strong id="totalVisitors">0</strong></span>
-        <span>👤 Unique visitors: <strong id="uniqueVisitors">0</strong></span>
-    </div>
-</div>
+
         <!-- subject tabs -->
         <div class="subject-tabs" id="subjectTabs">
             <button class="subject-btn active" data-subject="all">All <span class="subject-count" id="countAll">0</span></button>
             <button class="subject-btn" data-subject="Mixed">Mixed <span class="subject-count" id="countMixed">0</span></button>
             <button class="subject-btn" data-subject="Anatomy">Anatomy <span class="subject-count" id="countAnatomy">0</span></button>
             <button class="subject-btn" data-subject="Physiology">Physiology <span class="subject-count" id="countPhysiology">0</span></button>
-            <button class="subject-btn" data-subject="Biochemistry">Biochemistry <span class="subject-count" id="countBiochemistry">0</span></button>
-            <button class="subject-btn" data-subject="Histology">Histology <span class="subject-count" id="countHistology">0</span></button>
             <button class="subject-btn" data-subject="Pharmacology">Pharmacology <span class="subject-count" id="countPharmacology">0</span></button>
+            <!-- ─── NEW TABS ─── -->
+            <button class="subject-btn" data-subject="Microbiology">Microbiology <span class="subject-count" id="countMicrobiology">0</span></button>
+            <button class="subject-btn" data-subject="Pathology">Pathology <span class="subject-count" id="countPathology">0</span></button>
+            <button class="subject-btn" data-subject="Parasitology">Parasitology <span class="subject-count" id="countParasitology">0</span></button>
         </div>
 
         <!-- progress -->
@@ -161,9 +174,7 @@
 
         // ─── Explanation Engine ──────────────────────────────────────────────
         function getDetailedExplanation(q) {
-            // If the question has a built-in explanation, use it
             if (q.explanation) return q.explanation;
-            // Otherwise generate a fallback
             const correctText = q.options[q.answer] || 'Unknown';
             return `The correct answer is ${LABELS[q.answer]}: "${correctText}". This is the best choice because it accurately reflects the established principle. The other options are either incorrect or describe different structures/functions.`;
         }
@@ -190,6 +201,11 @@
             document.getElementById('countBiochemistry').textContent = getSubjectCount('Biochemistry');
             document.getElementById('countHistology').textContent = getSubjectCount('Histology');
             document.getElementById('countPharmacology').textContent = getSubjectCount('Pharmacology');
+            // ─── NEW SUBJECTS ───
+            document.getElementById('countMixed').textContent = getSubjectCount('Mixed');
+            document.getElementById('countMicrobiology').textContent = getSubjectCount('Microbiology');
+            document.getElementById('countPathology').textContent = getSubjectCount('Pathology');
+            document.getElementById('countParasitology').textContent = getSubjectCount('Parasitology');
         }
 
         // ─── Set subject ──────────────────────────────────────────────────────
@@ -470,6 +486,6 @@
         updateSubjectCounts();
         setSubject('all');
     </script>
-<script src="counter.js"></script>
+
 </body>
 </html>
