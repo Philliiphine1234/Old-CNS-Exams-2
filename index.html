@@ -19,6 +19,8 @@
                     <strong id="qCounter">0</strong> / <span id="totalQ">0</span>
                 </div>
             </div>
+        </div>
+
         <!-- subject tabs -->
         <div class="subject-tabs" id="subjectTabs">
             <button class="subject-btn active" data-subject="all">All <span class="subject-count" id="countAll">0</span></button>
@@ -176,17 +178,21 @@
             return state.allQuestions.filter(q => q.subject === subject).length;
         }
 
+        // ─── SAFE updateSubjectCounts ────────────────────────────────────────
         function updateSubjectCounts() {
-            document.getElementById('countAll').textContent = state.allQuestions.length;
-            document.getElementById('countMixed').textContent = getSubjectCount('Mixed');
-            document.getElementById('countAnatomy').textContent = getSubjectCount('Anatomy');
-            document.getElementById('countPhysiology').textContent = getSubjectCount('Physiology');
-            document.getElementById('countBiochemistry').textContent = getSubjectCount('Biochemistry');
-            document.getElementById('countHistology').textContent = getSubjectCount('Histology');
-            document.getElementById('countPharmacology').textContent = getSubjectCount('Pharmacology');
-            document.getElementById('countMicrobiology').textContent = getSubjectCount('Microbiology');
-            document.getElementById('countPathology').textContent = getSubjectCount('Pathology');
-            document.getElementById('countParasitology').textContent = getSubjectCount('Parasitology');
+            // Only update elements that exist in the DOM
+            const ids = ['countAll', 'countMixed', 'countAnatomy', 'countPhysiology', 'countPharmacology', 'countMicrobiology', 'countPathology', 'countParasitology'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const subject = id.replace('count', '');
+                    if (subject === 'All') {
+                        el.textContent = state.allQuestions.length;
+                    } else {
+                        el.textContent = getSubjectCount(subject);
+                    }
+                }
+            });
         }
 
         // ─── Set subject ──────────────────────────────────────────────────────
