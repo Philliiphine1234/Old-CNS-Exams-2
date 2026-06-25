@@ -42,8 +42,9 @@
             <button class="subject-btn" data-subject="Mixed">Mixed <span class="subject-count" id="countMixed">0</span></button>
             <button class="subject-btn" data-subject="Anatomy">Anatomy <span class="subject-count" id="countAnatomy">0</span></button>
             <button class="subject-btn" data-subject="Physiology">Physiology <span class="subject-count" id="countPhysiology">0</span></button>
+            <button class="subject-btn" data-subject="Biochemistry">Biochemistry <span class="subject-count" id="countBiochemistry">0</span></button>
+            <button class="subject-btn" data-subject="Histology">Histology <span class="subject-count" id="countHistology">0</span></button>
             <button class="subject-btn" data-subject="Pharmacology">Pharmacology <span class="subject-count" id="countPharmacology">0</span></button>
-            <!-- ─── NEW TABS ─── -->
             <button class="subject-btn" data-subject="Microbiology">Microbiology <span class="subject-count" id="countMicrobiology">0</span></button>
             <button class="subject-btn" data-subject="Pathology">Pathology <span class="subject-count" id="countPathology">0</span></button>
             <button class="subject-btn" data-subject="Parasitology">Parasitology <span class="subject-count" id="countParasitology">0</span></button>
@@ -114,8 +115,9 @@
     </div>
 
     <!-- ─── External Scripts ──────────────────────────────────────────── -->
-    <script src="questions.js?v=3"></script>
+    <script src="questions.js?v=4"></script>
     <script src="theme.js"></script>
+    <script src="counter.js"></script>
 
     <!-- ─── Main Quiz Engine ──────────────────────────────────────────── -->
     <script>
@@ -196,13 +198,12 @@
 
         function updateSubjectCounts() {
             document.getElementById('countAll').textContent = state.allQuestions.length;
+            document.getElementById('countMixed').textContent = getSubjectCount('Mixed');
             document.getElementById('countAnatomy').textContent = getSubjectCount('Anatomy');
             document.getElementById('countPhysiology').textContent = getSubjectCount('Physiology');
             document.getElementById('countBiochemistry').textContent = getSubjectCount('Biochemistry');
             document.getElementById('countHistology').textContent = getSubjectCount('Histology');
             document.getElementById('countPharmacology').textContent = getSubjectCount('Pharmacology');
-            // ─── NEW SUBJECTS ───
-            document.getElementById('countMixed').textContent = getSubjectCount('Mixed');
             document.getElementById('countMicrobiology').textContent = getSubjectCount('Microbiology');
             document.getElementById('countPathology').textContent = getSubjectCount('Pathology');
             document.getElementById('countParasitology').textContent = getSubjectCount('Parasitology');
@@ -486,6 +487,5 @@
         updateSubjectCounts();
         setSubject('all');
     </script>
-
 </body>
 </html>
