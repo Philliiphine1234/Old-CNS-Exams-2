@@ -5,6 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CNS Paper 2 – Full Quiz</title>
     <link rel="stylesheet" href="style.css" />
+    <style>
+        /* ─── Header layout adjustments ─── */
+        .quiz-header {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .header-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header-row-counter {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .header-row-text {
+            text-align: center;
+            font-size: 16px;
+            color: var(--text);
+            padding: 4px 0;
+            width: 100%;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 550px) {
+            .header-row-text {
+                font-size: 14px;
+            }
+            .header-row-counter {
+                font-size: 13px;
+                justify-content: center; /* center on small screens */
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -12,19 +57,20 @@
 
         <!-- header -->
         <div class="quiz-header">
-            <div class="quiz-title">🧠 CNS <span>Paper 2</span></div>
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌓</button>
-                <div class="progress-badge">
-                    <strong id="qCounter">0</strong> / <span id="totalQ">0</span>
+
+            <!-- Row 1: Title + Toggle & Badge -->
+            <div class="header-row-top">
+                <div class="quiz-title">🧠 CNS <span>Paper 2</span></div>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌓</button>
+                    <div class="progress-badge">
+                        <strong id="qCounter">0</strong> / <span id="totalQ">0</span>
+                    </div>
                 </div>
-                <!-- ─── CUSTOM TEXT ─── -->
-<div style="font-size:16px; color:var(--text); text-align:center; margin-top:6px; width:100%; padding:6px 0; border-top:1px solid var(--border);">
-    إِنَّ اللَّهَ وَمَلائِكَتَهُ يُصَلُّونَ عَلَى النَّبِيِّ يَا أَيُّهَا الَّذِينَ آمَنُوا صَلُّوا عَلَيْهِ وَسَلِّمُوا تَسْلِيمًا
-</div>
             </div>
-            <!-- ─── VISITOR COUNTER ─── -->
-            <div style="font-size:14px; color:var(--text-light); margin-top:4px; width:100%; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center;">
+
+            <!-- Row 2: Visitor Counter (aligned right) -->
+            <div class="header-row-counter">
                 <span>👤 Visitors:</span>
                 <a href="https://www.hitwebcounter.com/age-calculator" target="_blank" rel="noopener" title="https://www.hitwebcounter.com/age-calculator">
                     <img src="https://www.hitwebcounter.com/counter/counter.php?page=21506014&amp;style=0036&amp;nbdigits=4&amp;type=ip" alt="Visitor Counter" decoding="async" style="border:0;max-width:100%;height:auto;vertical-align:middle;" />
@@ -33,6 +79,12 @@
                     <a href="https://www.hitwebcounter.com/" target="_blank" rel="noopener" style="color:var(--text-light);text-decoration:none;">HitWebCounter</a>
                 </span>
             </div>
+
+            <!-- Row 3: Custom Text (centered) -->
+            <div class="header-row-text">
+                إِنَّ اللَّهَ وَمَلائِكَتَهُ يُصَلُّونَ عَلَى النَّبِيِّ يَا أَيُّهَا الَّذِينَ آمَنُوا صَلُّوا عَلَيْهِ وَسَلِّمُوا تَسْلِيمًا
+            </div>
+
         </div>
 
         <!-- subject tabs -->
@@ -194,7 +246,6 @@
 
         // ─── SAFE updateSubjectCounts ────────────────────────────────────────
         function updateSubjectCounts() {
-            // Only update elements that exist in the DOM
             const ids = ['countAll', 'countMixed', 'countAnatomy', 'countPhysiology', 'countPharmacology', 'countMicrobiology', 'countPathology', 'countParasitology'];
             ids.forEach(id => {
                 const el = document.getElementById(id);
